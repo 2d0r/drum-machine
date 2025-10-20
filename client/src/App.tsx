@@ -1,16 +1,20 @@
 import './App.css';
 import Controls from './components/Controls';
+import FileLoadModal from './components/FileLoadModal';
 import Sequencer from './components/Sequencer';
-import { SequencerContextProvider } from './shared/sequencerContext';
+import Toast from './components/Toast';
+import { SequencerContextProvider } from './lib/sequencerContext';
 
 function App() {
 
   return (
     <SequencerContextProvider>
-      <main className='flex flex-col gap-4 text-white'>
+      <main className='flex flex-col gap-4 text-white relative'>
         <Sequencer />
         <Controls />
       </main>
+      <FileLoadModal />
+      <Toast />
     </SequencerContextProvider>
   )
 }

@@ -1,16 +1,19 @@
 import * as Tone from 'tone';
 import { createContext, useContext, useEffect, useRef, useState, type ReactNode } from 'react';
-import type { DrumName, Pattern } from './types';
+import { type TimeSig, type DrumName, type Pattern } from '@shared/types';
 import { DEFAULT_PATTERN, DRUM_SAMPLES } from './constants';
+import { generateEmptyPattern } from './utils';
 
 type SessionContextType = {
     sequence: Tone.Sequence | undefined;
     setSequence: (sq: Tone.Sequence) => void;
-    isPlaying: boolean; setIsPlaying: (b: boolean) => void;
-    pattern: Pattern; setPattern: (p: Pattern) => void;
+    isPlaying: boolean; setIsPlaying: (_: boolean) => void;
     patternRef: React.RefObject<Pattern>;
-    currentStep: number; setCurrentStep: (n: number) => void;
-    tempo: number; setTempo: (n: number) => void;
+    currentStep: number; setCurrentStep: (_: number) => void;
+    tempo: number; setTempo: (_: number) => void;
+    timeSig: TimeSig; setTimeSig: (t: TimeSig) => void;
+    toast: string; setToast: (_: string) => void;
+    fileLoadModal: boolean; setFileLoadModal: (_: boolean) => void;
 }
 
 const SequencerContext = createContext<SessionContextType | undefined>(undefined);
@@ -20,8 +23,10 @@ export function SequencerContextProvider({children}: {children: ReactNode}) {
     const [isPlaying, setIsPlaying] = useState<boolean>(false);
     const [currentStep, setCurrentStep] = useState<number>(0);
     const [tempo, setTempo] = useState<number>(120);
+    const [timeSig, setTimeSig] = useState<TimeSig>('4/4');
+    const [toast, setToast] = useState<string>('');
+    const [fileLoadModal, setFileLoadModal] = useState<boolean>(false);
 
-    const [pattern, setPattern] = useState<Pattern>(DEFAULT_PATTERN);
     const patternRef = useRef<Pattern>(DEFAULT_PATTERN);
 
     const drums: DrumName[] = Object.keys(DRUM_SAMPLES) as DrumName[];
@@ -30,27 +35,53 @@ export function SequencerContextProvider({children}: {children: ReactNode}) {
         const startTone = async () => await Tone.start();
         startTone();
 
-        const newSequence = new Tone.Sequence(
+        const newSequence = generateNewSequence();
+        setSequence(newSequence);
+    }, []);
+
+    useEffect(() => {
+        const seqLength = timeSig === '4/4' ? 16 : 12;
+
+        if (sequence) {
+            sequence.stop();
+            sequence.dispose();
+        }
+        
+        const newPattern = generateEmptyPattern(seqLength);
+        patternRef.current = newPattern;
+        
+        setSequence(generateNewSequence(seqLength, newPattern));
+    }, [timeSig]);
+
+    useEffect(() => {
+        if (patternRef.current.steps)
+            setSequence(generateNewSequence(16, patternRef.current));
+    }, [patternRef.current]);
+
+    const generateNewSequence = (length: number = 16, pattern: Pattern = DEFAULT_PATTERN) => {
+        return new Tone.Sequence(
             (time, step) => {
                 setCurrentStep(step);
                 drums.forEach(drum => {
-                    if (patternRef.current[drum][step].active) {
+                    if (pattern.steps[drum][step].active) {
                         DRUM_SAMPLES[drum].start(time);
                     }
                 });
             },
-            Array.from({length: 16}, (_, i) => i), // 16 steps
-            "16n"
+            Array.from({length}, (_, i) => i), // 16 steps
+            '16n'
         );
-        setSequence(newSequence);
-    }, []);
+    }
 
     return (<SequencerContext.Provider value={{
         sequence, setSequence, 
         isPlaying, setIsPlaying, 
-        pattern, setPattern, patternRef,
+        patternRef,
         currentStep, setCurrentStep,
         tempo, setTempo,
+        timeSig, setTimeSig,
+        toast, setToast,
+        fileLoadModal, setFileLoadModal,
     }}>
         {children}
     </SequencerContext.Provider>)

@@ -16,7 +16,7 @@
 }
 
 body {
-  @apply min-w-[100vw] min-h-[100vh] m-0 flex items-center justify-center bg-black;
+  @apply min-w-[100vw] min-h-[100vh] m-0 flex items-center justify-center bg-black relative;
 }
 
 input::-webkit-outer-spin-button,

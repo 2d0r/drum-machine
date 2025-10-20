@@ -4,7 +4,7 @@ dotenv.config();
 import express from 'express';
 import mongoose from 'mongoose';
 import cors from 'cors';
-import patternRoutes from './routes/patterns.ts';
+import patternRoutes from './routes/patterns';
 
 const app = express();
 app.use(cors());

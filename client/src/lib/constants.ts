@@ -1,5 +1,5 @@
 import * as Tone from 'tone';
-import type { DrumName, Pattern } from './types';
+import type { DrumName, Pattern } from '@shared/types';
 
 export const DRUM_SAMPLES_TONEJS = {
     kick: 'https://tonejs.github.io/audio/drum-samples/Kit8/kick.mp3',
@@ -23,10 +23,14 @@ export const DRUM_SAMPLES: Record<DrumName, Tone.Player> = {
 };
 
 export const DEFAULT_PATTERN: Pattern = {
+  name: 'Empty pattern',
+  steps: {
     kick: Array(16).fill({ active: false }),
     snare: Array(16).fill({ active: false }),
     hihat: Array(16).fill({ active: false }),
     openhh: Array(16).fill({ active: false }),
     tom1: Array(16).fill({ active: false }),
     tom2: Array(16).fill({ active: false }),
+  },
+  createdAt: new Date(),
 };

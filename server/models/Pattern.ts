@@ -1,10 +1,27 @@
-// models/Pattern.ts
 import { Schema, model } from 'mongoose';
+import type { Pattern as PatternType } from '../../shared/types';
 
-const PatternSchema = new Schema({
-  name: String,
-  steps: [String],
-  createdAt: { type: Date, default: Date.now }
+const StepSchema = new Schema(
+  { active: { type: Boolean, required: true } },
+  { _id: false },
+);
+
+const StepsSchema = new Schema(
+  {
+    kick: { type: [StepSchema], default: [] },
+    snare: { type: [StepSchema], default: [] },
+    hihat: { type: [StepSchema], default: [] },
+    openhh: { type: [StepSchema], default: [] },
+    tom1: { type: [StepSchema], default: [] },
+    tom2: { type: [StepSchema], default: [] },
+  },
+  { _id: false },
+);
+
+const PatternSchema = new Schema<PatternType>({
+  name: { type: String, required: true },
+  steps: { type: StepsSchema, required: true },
+  createdAt: { type: Date, default: Date.now },
 });
 
-export default model('Pattern', PatternSchema);
+export const Pattern = model('Pattern', PatternSchema);
