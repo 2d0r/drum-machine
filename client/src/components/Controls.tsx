@@ -3,10 +3,11 @@ import * as Tone from 'tone';
 import { useSequencerContext } from '../lib/sequencerContext';
 import type { TimeSig } from '@shared/types';
 import { useRef } from 'react';
+import { generateEmptyPattern, generateNewSequence } from '../lib/utils';
 
 export default function Controls() {
     const {
-        sequence,
+        sequenceRef,
         isPlaying, setIsPlaying,
         currentStep, setCurrentStep,
         tempo, setTempo,
@@ -15,21 +16,59 @@ export default function Controls() {
         setToast, setFileLoadModal,
     } = useSequencerContext();
     const tempoDebounceRef = useRef<number | null>(null);
+    const toneStartedRef = useRef<boolean>(false);
+    const lastStartRef = useRef<number>(0);
 
     const handlePlay = async () => {
-        sequence?.start(currentStep);
+        if (!toneStartedRef.current) {
+            await Tone.start();
+            toneStartedRef.current = true;
+        }
+
+        let sequence = sequenceRef.current;
+
+        // If transport is paused, just resume
+        if (Tone.getTransport().state === 'paused' && sequence) {
+            Tone.getTransport().start();
+            setIsPlaying(true);
+            return;
+        }
+
+        // If sequence exists but transport was stopped, dispose old one
+        if (sequence) {
+            sequence.stop(Tone.now());
+            sequence.dispose();
+            sequenceRef.current = null;
+        }
+
+        // Create a new sequence
+        sequence = generateNewSequence({ setCurrentStep, pattern: patternRef.current });
+        sequenceRef.current = sequence;
+
+        
+        // Start the sequence slightly in the future to avoid race conditions
+        const offsetStep = currentStep ?? 0;
+        sequence.start("+0.01", offsetStep);
+
+        lastStartRef.current = Tone.now();
         Tone.getTransport().start();
         setIsPlaying(true);
     };
 
     const handlePause = async () => {
-        Tone.getTransport().stop();
+        Tone.getTransport().pause();
         setIsPlaying(false);
     };
 
     const handleStop = async () => {
+        const sequence = sequenceRef.current;
+        if (sequence) {
+            sequence.stop(Tone.now());
+            sequence.dispose();
+        }
         Tone.getTransport().stop();
         Tone.getTransport().position = 0;
+        lastStartRef.current = 0;
         setCurrentStep(0);
         setIsPlaying(false);
     };
@@ -53,6 +92,12 @@ export default function Controls() {
     const handleSelectTimeSignature = async (selection: TimeSig) => {
         setTimeSig(selection);
         await handleStop();
+
+        const seqLength = selection === '4/4' ? 16 : 12;
+        const newPattern = generateEmptyPattern(seqLength);
+        patternRef.current = newPattern;
+        
+        sequenceRef.current = generateNewSequence({ setCurrentStep, pattern: newPattern });
     };
 
     const handleSavePattern = async () => {

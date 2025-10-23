@@ -1,7 +1,6 @@
 import type { DrumName, Pattern } from '@shared/types';
 import { useSequencerContext } from '../lib/sequencerContext';
 import { useEffect, useState } from 'react';
-import { generateEmptyPattern } from '../lib/utils';
 
 export default function Sequencer() {
     const { patternRef, currentStep, timeSig, isPlaying } = useSequencerContext();
@@ -15,10 +14,6 @@ export default function Sequencer() {
         patternRef.current = updatedPattern;
         setPattern(updatedPattern);
     };
-
-    useEffect(() => {
-        setPattern(generateEmptyPattern(timeSig === '4/4' ? 16 : 12));
-    }, [timeSig]);
 
     useEffect(() => {
         setPattern(patternRef.current);

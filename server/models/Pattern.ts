@@ -21,6 +21,7 @@ const StepsSchema = new Schema(
 const PatternSchema = new Schema<PatternType>({
   name: { type: String, required: true },
   steps: { type: StepsSchema, required: true },
+  length: { type: Number, required: true },
   createdAt: { type: Date, default: Date.now },
 });
 

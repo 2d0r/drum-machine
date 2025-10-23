@@ -8,6 +8,7 @@ export interface Step {
 export type Pattern = {
   name: string;
   steps: Record<DrumName, Step[]>;
+  length: number;
   createdAt: Date;
   _id?: string;
 };
