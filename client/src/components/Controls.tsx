@@ -12,12 +12,13 @@ export default function Controls() {
         currentStep, setCurrentStep,
         tempo, setTempo,
         timeSig, setTimeSig,
-        patternRef,
-        setToast, setFileLoadModal,
+        patternRef, lastStartRef,
+        setModal,
+        stopSequence
     } = useSequencerContext();
     const tempoDebounceRef = useRef<number | null>(null);
     const toneStartedRef = useRef<boolean>(false);
-    const lastStartRef = useRef<number>(0);
+    
 
     const handlePlay = async () => {
         if (!toneStartedRef.current) {
@@ -60,18 +61,7 @@ export default function Controls() {
         setIsPlaying(false);
     };
 
-    const handleStop = async () => {
-        const sequence = sequenceRef.current;
-        if (sequence) {
-            sequence.stop(Tone.now());
-            sequence.dispose();
-        }
-        Tone.getTransport().stop();
-        Tone.getTransport().position = 0;
-        lastStartRef.current = 0;
-        setCurrentStep(0);
-        setIsPlaying(false);
-    };
+    const handleStop = () => stopSequence();
 
     const handleChangeTempo = (event: React.ChangeEvent<HTMLInputElement>) => {
         const newTempo = Number(event.target.value);
@@ -91,7 +81,7 @@ export default function Controls() {
 
     const handleSelectTimeSignature = async (selection: TimeSig) => {
         setTimeSig(selection);
-        await handleStop();
+        stopSequence();
 
         const seqLength = selection === '4/4' ? 16 : 12;
         const newPattern = generateEmptyPattern(seqLength);
@@ -100,27 +90,18 @@ export default function Controls() {
         sequenceRef.current = generateNewSequence({ setCurrentStep, pattern: newPattern });
     };
 
-    const handleSavePattern = async () => {
-        const res = await fetch('http://localhost:4000/api/patterns', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(patternRef.current),
-        });
-        if (res.ok) {
-            setToast('Saved pattern!');
-        } else {
-            setToast('Failed to save pattern!');
-        }
+    const handleSave = async () => {
+        setModal('save');
     };
 
     const handleLoad = async () => {
-        setFileLoadModal(true);
+        setModal('load');
     }
 
     return (
-        <div id='controls' className='h-10 flex items-center'>
+        <div id='controls' className='w-full h-10 flex items-center'>
             <div id='controls-left' className='flex gap-2 flex-1'>
-                <div id='tempo' className='h-10 rounded-xl border-1 border-gray-700 px-2 flex gap-1 items-center justify-between cursor-pointer'>
+                <div id='tempo' className='h-10 border-1 border-gray-700 px-2 rounded-xl flex gap-1 items-center justify-between cursor-pointer'>
                     <Timer className='text-gray-700 h-5' />
                     <input
                         value={tempo}
@@ -131,7 +112,7 @@ export default function Controls() {
                         max='200'
                     />
                 </div>
-                <div id='time-signature' className='w-24 h-10 border-1 border-gray-700 rounded-xl flex gap-2 items-center justify-center cursor-pointer'>
+                <div id='time-signature' className='w-24 h-10 border-1 border-gray-700 rounded-xl px-2 flex gap-2 items-center justify-center cursor-pointer'>
                     <Columns2 className='h-5 text-gray-700' />
                     <select
                         onChange={(e) => handleSelectTimeSignature(e.target.value as TimeSig)}
@@ -173,7 +154,7 @@ export default function Controls() {
                 </button>
                 <button 
                     type='button' 
-                    onClick={handleSavePattern}
+                    onClick={handleSave}
                     className='w-24 h-10 border-1 border-gray-700 rounded-xl px-2 text-center cursor-pointer flex gap-2 items-center'
                 >
                     <Save className='h-5 text-gray-700' />

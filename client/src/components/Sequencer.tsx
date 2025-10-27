@@ -29,7 +29,7 @@ export default function Sequencer() {
             <input 
                 value={pattern.name as string}
                 onChange={(e) => handleRename(e)}
-                className='border-b-1 border-gray-700 p-2 w-70 text-center text-2xl focus:outline-0'
+                className='border-1 border-gray-700 rounded-xl p-2 w-70 text-center text-2xl focus:outline-0'
             />
         </div>
         <div id='grid' className='flex flex-col border-1 border-gray-700 rounded-xl overflow-clip'>

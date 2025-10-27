@@ -25,4 +25,11 @@ const PatternSchema = new Schema<PatternType>({
   createdAt: { type: Date, default: Date.now },
 });
 
+const GenrePatternSchema = new Schema({
+  name: { type: String, required: true },
+  steps: { type: StepsSchema, required: true },
+  length: { type: Number, required: true },
+});
+
 export const Pattern = model('Pattern', PatternSchema);
+export const GenrePattern = model('GenrePatern', GenrePatternSchema);

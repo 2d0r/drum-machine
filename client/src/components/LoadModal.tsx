@@ -4,12 +4,12 @@ import { useEffect, useState } from 'react';
 import { type Pattern } from '@shared/types';
 import { deletePattern, getPatterns } from '../lib/services';
 
-export default function FileLoadModal() {
-    const { fileLoadModal, setFileLoadModal, patternRef } = useSequencerContext();
+export default function LoadModal() {
+    const { modal, setModal, patternRef } = useSequencerContext();
     const [patterns, setPatterns] = useState<Pattern[] | null>(null);
 
     useEffect(() => {
-        if (fileLoadModal) {
+        if (modal === 'load') {
             getPatterns()
             .then(newPatterns => {
                 console.log('newPatterns', newPatterns)
@@ -17,11 +17,11 @@ export default function FileLoadModal() {
             })
             .catch(error => console.error(error));
         }
-    }, [fileLoadModal]);
+    }, [modal]);
 
     const handleLoadPattern = (pattern: Pattern) => {
         patternRef.current = pattern;
-        setFileLoadModal(false);
+        setModal(null);
     }
 
     const handleDeletePattern = async (e: React.MouseEvent<SVGSVGElement, MouseEvent>, patternId: string) => {
@@ -37,10 +37,10 @@ export default function FileLoadModal() {
     
     const handleClose = () => {
         setPatterns([]);
-        setFileLoadModal(false);
+        setModal(null);
     }
 
-    return (fileLoadModal ? 
+    return (modal === 'load' ? 
         <div className='absolute min-w-screen min-h-screen top-0 left-0 bg-black/60 flex items-center justify-center'>
             <div className='w-80 min-h-24 max-h-[80vh] border-1 border-gray-700 rounded-xl overflow-clip bg-gray-950'>
                 <div className='w-full h-10 border-b-1 border-gray-700 relative flex items-center justify-center text-gray-600'>

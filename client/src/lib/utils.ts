@@ -8,7 +8,7 @@ export const getTonejsDrumSampleUrl = (kit: string, drum: DrumName) => {
 
 export const generateEmptyPattern = (length: number) => {
     const pattern = {
-        name: 'Empty pattern',
+        name: 'New pattern',
         steps: {},
         length,
         createdAt: new Date(),

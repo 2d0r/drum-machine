@@ -1,9 +1,12 @@
 export type DrumName = 'kick' | 'snare' | 'hihat' | 'openhh' | 'tom1' | 'tom2'
   // | 'ride' | 'crash' | 'tom3';
 
-export interface Step {
-  active: boolean;
-}
+export type GenrePattern = {
+  name: string;
+  steps: Record<DrumName, Step[]>;
+  length: number;
+  _id?: string;
+};
 
 export type Pattern = {
   name: string;
@@ -12,5 +15,11 @@ export type Pattern = {
   createdAt: Date;
   _id?: string;
 };
+
+export type ModalName = 'load' | 'save' | null; 
+
+export interface Step {
+  active: boolean;
+}
 
 export type TimeSig = '4/4' | '3/4';

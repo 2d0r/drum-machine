@@ -1,6 +1,6 @@
 import * as Tone from 'tone';
 import { createContext, useContext, useRef, useState, type ReactNode } from 'react';
-import { type TimeSig, type Pattern } from '@shared/types';
+import { type TimeSig, type Pattern, type ModalName } from '@shared/types';
 import { DEFAULT_PATTERN } from './constants';
 
 type SessionContextType = {
@@ -11,7 +11,10 @@ type SessionContextType = {
     tempo: number; setTempo: (_: number) => void;
     timeSig: TimeSig; setTimeSig: (t: TimeSig) => void;
     toast: string; setToast: (_: string) => void;
-    fileLoadModal: boolean; setFileLoadModal: (_: boolean) => void;
+    stopSequence: () => void;
+    lastStartRef:  React.RefObject<number>;
+    modal: ModalName; setModal: (_: ModalName) => void;
+    updateGenreTags: boolean;  setUpdateGenreTags: (_: boolean) => void; 
 }
 
 const SequencerContext = createContext<SessionContextType | undefined>(undefined);
@@ -22,20 +25,37 @@ export function SequencerContextProvider({children}: {children: ReactNode}) {
     const [tempo, setTempo] = useState<number>(120);
     const [timeSig, setTimeSig] = useState<TimeSig>('4/4');
     const [toast, setToast] = useState<string>('');
-    const [fileLoadModal, setFileLoadModal] = useState<boolean>(false);
+    const [modal, setModal] = useState<ModalName>(null);
+    const [updateGenreTags, setUpdateGenreTags] = useState<boolean>(false);
 
     const patternRef = useRef<Pattern>(DEFAULT_PATTERN);
     const sequenceRef = useRef<Tone.Sequence>(null);
+    const lastStartRef = useRef<number>(0);
+
+    const stopSequence = async () => {
+        const sequence = sequenceRef.current;
+        if (sequence) {
+            sequence.stop(Tone.now());
+            sequence.dispose();
+        }
+        Tone.getTransport().stop();
+        Tone.getTransport().position = 0;
+        lastStartRef.current = 0;
+        setCurrentStep(0);
+        setIsPlaying(false);
+    };
 
     return (<SequencerContext.Provider value={{
         sequenceRef,
         isPlaying, setIsPlaying, 
-        patternRef,
+        patternRef, lastStartRef,
         currentStep, setCurrentStep,
         tempo, setTempo,
         timeSig, setTimeSig,
         toast, setToast,
-        fileLoadModal, setFileLoadModal,
+        modal, setModal,
+        stopSequence,
+        updateGenreTags, setUpdateGenreTags,
     }}>
         {children}
     </SequencerContext.Provider>)

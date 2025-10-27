@@ -23,7 +23,7 @@ export const DRUM_SAMPLES: Record<DrumName, Tone.Player> = {
 };
 
 export const DEFAULT_PATTERN: Pattern = {
-  name: 'Empty pattern',
+  name: 'New pattern',
   steps: {
     kick: Array(16).fill({ active: false }),
     snare: Array(16).fill({ active: false }),
