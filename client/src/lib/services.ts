@@ -52,32 +52,40 @@ export const deletePattern = async (id: string) => {
 
 // GENRE PATTERNS
 
-export const getGenrePatterns = async () => {
+export const getGenrePatterns = async (): Promise<{
+    ok: boolean; data: GenrePattern[]; error?: string
+}> => {
     try {
         const res = await fetch('http://localhost:4000/api/genre-patterns');
         const json = await res.json();
-        if (res.ok) {
-            return json.data;
-        } else {
-            console.error(json.message || json.error || 'Unknown error');
-            return [];
+
+        if (!res.ok) {
+            return { ok: false, data: [], error: json.message || json.error || 'Unknown error' };
         }
+        return { ok: true, data: json.data };
     } catch (error) {
         console.error('Failed request to get genre patterns:', error);
-        return [];
+        return { ok: false, data: [], error: String(error) };
     }
 }
 
-export const saveGenrePattern = async (pattern: GenrePattern) => {
+export const saveGenrePattern = async ( pattern: GenrePattern ) : Promise<{ 
+    ok: boolean; data?: GenrePattern; error?: string 
+}> => {
     try {
         const res = await fetch('http://localhost:4000/api/genre-patterns', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ ...pattern, _id: null }),
         });
-        return res;
+        const json = await res.json();
+
+        if (!res.ok) {
+        return { ok: false, error: json.message || json.error || 'Failed to save genre pattern' };
+        }
+        return { ok: true, data: json.data };
     } catch (error) {
-        console.error('Failed request to save genre pattern', error);
-        return null;
+        console.error('Failed request to save genre pattern:', error);
+        return { ok: false, error: String(error) };
     }
 }

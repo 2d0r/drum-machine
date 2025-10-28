@@ -1,9 +1,9 @@
 import type { DrumName, Pattern } from '@shared/types';
 import { useSequencerContext } from '../lib/sequencerContext';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 
 export default function Sequencer() {
-    const { patternRef, currentStep, timeSig, isPlaying } = useSequencerContext();
+    const { patternRef, currentStep, timeSig, isPlaying, setGenreTagsStatus } = useSequencerContext();
     const [pattern, setPattern] = useState<Pattern>(patternRef.current);
 
     const toggleStep = (drum: DrumName, index: number) => {
@@ -13,11 +13,8 @@ export default function Sequencer() {
         );
         patternRef.current = updatedPattern;
         setPattern(updatedPattern);
+        setGenreTagsStatus('detect');
     };
-
-    useEffect(() => {
-        setPattern(patternRef.current);
-    }, [patternRef.current]);
 
     const handleRename = (e: React.ChangeEvent<HTMLInputElement>) => {
         setPattern(prev => ({...prev, name: e.target.value}));

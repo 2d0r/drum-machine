@@ -4,7 +4,7 @@ import { savePattern, saveGenrePattern } from '../lib/services';
 import { useState } from 'react';
 
 export default function SaveModal() {
-    const { setToast, patternRef, modal, setModal, setUpdateGenreTags } = useSequencerContext();
+    const { setToast, patternRef, modal, setModal, setGenreTagsStatus } = useSequencerContext();
     const [ patternName, setPatternName ] = useState<string>(patternRef.current.name);
 
     const handleSavePattern = async () => {
@@ -18,9 +18,9 @@ export default function SaveModal() {
 
     const handleSaveGenrePattern = async () => {
         const res = await saveGenrePattern({...patternRef.current, name: patternName});
-        if (res?.ok) {
+        if (res.ok) {
             setToast('Saved genre pattern!');
-            setUpdateGenreTags(true);
+            setGenreTagsStatus('load');
         } else {
             setToast('Failed to save genre pattern');
         }

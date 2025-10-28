@@ -8,6 +8,8 @@ export type GenrePattern = {
   _id?: string;
 };
 
+export type GenreTagStatus = 'load' | 'detect' | 'ready';
+
 export type Pattern = {
   name: string;
   steps: Record<DrumName, Step[]>;

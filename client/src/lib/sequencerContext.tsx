@@ -1,6 +1,6 @@
 import * as Tone from 'tone';
 import { createContext, useContext, useRef, useState, type ReactNode } from 'react';
-import { type TimeSig, type Pattern, type ModalName } from '@shared/types';
+import { type TimeSig, type Pattern, type ModalName, type GenreTagStatus } from '@shared/types';
 import { DEFAULT_PATTERN } from './constants';
 
 type SessionContextType = {
@@ -14,7 +14,7 @@ type SessionContextType = {
     stopSequence: () => void;
     lastStartRef:  React.RefObject<number>;
     modal: ModalName; setModal: (_: ModalName) => void;
-    updateGenreTags: boolean;  setUpdateGenreTags: (_: boolean) => void; 
+    genreTagsStatus: GenreTagStatus;  setGenreTagsStatus: (_: GenreTagStatus) => void; 
 }
 
 const SequencerContext = createContext<SessionContextType | undefined>(undefined);
@@ -26,7 +26,7 @@ export function SequencerContextProvider({children}: {children: ReactNode}) {
     const [timeSig, setTimeSig] = useState<TimeSig>('4/4');
     const [toast, setToast] = useState<string>('');
     const [modal, setModal] = useState<ModalName>(null);
-    const [updateGenreTags, setUpdateGenreTags] = useState<boolean>(false);
+    const [genreTagsStatus, setGenreTagsStatus] = useState<GenreTagStatus>('ready');
 
     const patternRef = useRef<Pattern>(DEFAULT_PATTERN);
     const sequenceRef = useRef<Tone.Sequence>(null);
@@ -55,7 +55,7 @@ export function SequencerContextProvider({children}: {children: ReactNode}) {
         toast, setToast,
         modal, setModal,
         stopSequence,
-        updateGenreTags, setUpdateGenreTags,
+        genreTagsStatus, setGenreTagsStatus,
     }}>
         {children}
     </SequencerContext.Provider>)

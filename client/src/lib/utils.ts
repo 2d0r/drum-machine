@@ -1,12 +1,14 @@
 import { DEFAULT_PATTERN, DRUM_SAMPLES } from './constants';
-import type { DrumName, Pattern } from '@shared/types';
+import type { DrumName, GenrePattern, Pattern, TimeSig } from '@shared/types';
 import * as Tone from 'tone';
+import { getGenrePatterns } from './services';
 
 export const getTonejsDrumSampleUrl = (kit: string, drum: DrumName) => {
     return `https://tonejs.github.io/audio/drum-samples/${kit}/${drum}.mp3`;
 }
 
-export const generateEmptyPattern = (length: number) => {
+export const generateEmptyPattern = (timeSig: TimeSig) => {
+    const length = timeSig === '4/4' ? 16 : 12;
     const pattern = {
         name: 'New pattern',
         steps: {},
@@ -64,4 +66,41 @@ export const checkStartTimeIsGreaterThanPrevStartTime = (getCumulativeStep: numb
 
     if (startTime > prevStartTime) return true;
     return false;
+}
+
+export const detectGenre = async (pattern: Pattern) => {
+    // To do: filtered by timesig and similar tempo
+    const res = await getGenrePatterns();
+    if (!res.ok) {
+        console.error(res.error);
+        return;
+    }
+    const genrePatterns = res.data as GenrePattern[];
+
+    const p = pattern.steps;
+    const genreMatches: Record<string, number> = {};
+
+    genrePatterns.forEach(genrePattern => {
+        const gp = genrePattern.steps;
+        let matches = 0;
+        let genreHits = 0;
+
+        for (const [drum, steps] of Object.entries(gp)) {
+            if (!Object.keys(p).includes(drum)) continue;
+
+            for (let i = 0; i < steps.length; i++) {
+                if (!gp[drum as DrumName][i].active) continue;
+                if (gp[drum as DrumName][i].active) {
+                    genreHits += 1;
+                    if (p[drum as DrumName][i].active) {
+                        matches += 1;
+                    }
+                }
+            }
+        }
+
+        genreMatches[genrePattern.name] = matches / genreHits;
+    });
+
+    return genreMatches;
 }

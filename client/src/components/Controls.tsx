@@ -1,4 +1,4 @@
-import { Columns2, Folder, Pause, Play, Save, Shuffle, Square, Timer } from 'lucide-react';
+import { Columns2, Folder, Pause, Play, RotateCcw, Save, Shuffle, Square, Timer } from 'lucide-react';
 import * as Tone from 'tone';
 import { useSequencerContext } from '../lib/sequencerContext';
 import type { TimeSig } from '@shared/types';
@@ -79,12 +79,11 @@ export default function Controls() {
         }, 1000);
     };
 
-    const handleSelectTimeSignature = async (selection: TimeSig) => {
-        setTimeSig(selection);
+    const handleSelectTimeSignature = async (newTimeSig: TimeSig) => {
+        setTimeSig(newTimeSig);
         stopSequence();
 
-        const seqLength = selection === '4/4' ? 16 : 12;
-        const newPattern = generateEmptyPattern(seqLength);
+        const newPattern = generateEmptyPattern(newTimeSig);
         patternRef.current = newPattern;
         
         sequenceRef.current = generateNewSequence({ setCurrentStep, pattern: newPattern });
@@ -96,6 +95,10 @@ export default function Controls() {
 
     const handleLoad = async () => {
         setModal('load');
+    }
+
+    const handleReset = async () => {
+        patternRef.current = generateEmptyPattern(timeSig);
     }
 
     return (
@@ -144,6 +147,14 @@ export default function Controls() {
                 <Shuffle className='text-white cursor-pointer' />
             </div>
             <div id='controls-right' className='flex flex-1 gap-2 justify-end'>
+                <button 
+                    type='button'
+                    onClick={handleReset}
+                    className='w-24 h-10 button-primary text-center cursor-pointer flex gap-2 items-center'
+                >
+                    <RotateCcw className='h-5 text-gray-700' />
+                    Reset
+                </button>
                 <button 
                     type='button'
                     onClick={handleLoad}
