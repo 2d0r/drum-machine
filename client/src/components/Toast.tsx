@@ -18,7 +18,7 @@ export default function Toast() {
 
 
     return (toast ?
-        <div className='absolute bottom-4 left-1/2 -translate-1/2 w-1/3 border-1 border-gray-700 rounded-xl p-2 text-center text-gray-700'>
+        <div className='absolute bottom-4 left-1/2 -translate-1/2 w-1/3 border-1 border-gray-700 rounded-xl bg-gray-950 p-2 text-center text-gray-700'>
             {toast}
         </div>
         : <></>

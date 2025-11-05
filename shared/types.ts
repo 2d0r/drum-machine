@@ -4,7 +4,8 @@ export type DrumName = 'kick' | 'snare' | 'hihat' | 'openhh' | 'tom1' | 'tom2'
 export type GenrePattern = {
   name: string;
   steps: Record<DrumName, Step[]>;
-  length: number;
+  tempo: number;
+  timeSig: TimeSig;
   _id?: string;
 };
 
@@ -13,7 +14,8 @@ export type GenreTagStatus = 'load' | 'detect' | 'ready';
 export type Pattern = {
   name: string;
   steps: Record<DrumName, Step[]>;
-  length: number;
+  tempo: number;
+  timeSig: TimeSig;
   createdAt: Date;
   _id?: string;
 };

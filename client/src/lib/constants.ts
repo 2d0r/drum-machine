@@ -32,6 +32,7 @@ export const DEFAULT_PATTERN: Pattern = {
     tom1: Array(16).fill({ active: false }),
     tom2: Array(16).fill({ active: false }),
   },
-  length: 16,
+  tempo: 120,
+  timeSig: '4/4',
   createdAt: new Date(),
 };

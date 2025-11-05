@@ -1,5 +1,8 @@
 import { Schema, model } from 'mongoose';
-import type { Pattern as PatternType } from '../../shared/types';
+import { 
+  type GenrePattern as GenrePatternType, 
+  type Pattern as PatternType 
+} from '../../shared/types';
 
 const StepSchema = new Schema(
   { active: { type: Boolean, required: true } },
@@ -21,14 +24,16 @@ const StepsSchema = new Schema(
 const PatternSchema = new Schema<PatternType>({
   name: { type: String, required: true },
   steps: { type: StepsSchema, required: true },
-  length: { type: Number, required: true },
+  tempo: { type: Number, default: 120 },
+  timeSig: { type: String, required: true },
   createdAt: { type: Date, default: Date.now },
 });
 
-const GenrePatternSchema = new Schema({
+const GenrePatternSchema = new Schema<GenrePatternType>({
   name: { type: String, required: true },
   steps: { type: StepsSchema, required: true },
-  length: { type: Number, required: true },
+  tempo: { type: Number, default: 120 },
+  timeSig: { type: String, required: true },
 });
 
 export const Pattern = model('Pattern', PatternSchema);

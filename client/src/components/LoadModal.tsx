@@ -11,11 +11,10 @@ export default function LoadModal() {
     useEffect(() => {
         if (modal === 'load') {
             getPatterns()
-            .then(newPatterns => {
-                console.log('newPatterns', newPatterns)
-                setPatterns(newPatterns);
-            })
-            .catch(error => console.error(error));
+                .then(newPatterns => {
+                    setPatterns(newPatterns);
+                })
+                .catch(error => console.error(error));
         }
     }, [modal]);
 

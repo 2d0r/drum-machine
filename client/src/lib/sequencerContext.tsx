@@ -1,6 +1,6 @@
 import * as Tone from 'tone';
 import { createContext, useContext, useEffect, useRef, useState, type Dispatch, type ReactNode, type SetStateAction } from 'react';
-import { type TimeSig, type Pattern, type ModalName, type GenrePattern } from '@shared/types';
+import { type Pattern, type ModalName, type GenrePattern } from '@shared/types';
 import { DEFAULT_PATTERN } from './constants';
 
 type SessionContextType = {
@@ -12,8 +12,6 @@ type SessionContextType = {
     pattern: Pattern; setPattern: Dispatch<SetStateAction<Pattern>>;
     sequenceRef: React.RefObject<Tone.Sequence | null>;
     stopSequence: () => void;
-    tempo: number; setTempo: (_: number) => void;
-    timeSig: TimeSig; setTimeSig: (t: TimeSig) => void;
     toast: string; setToast: (_: string) => void;
 }
 
@@ -24,8 +22,6 @@ export function SequencerContextProvider({children}: {children: ReactNode}) {
     const [genrePatterns, setGenrePatterns] = useState<GenrePattern[]>([]);
     const [isPlaying, setIsPlaying] = useState<boolean>(false);
     const [currentStep, setCurrentStep] = useState<number>(0);
-    const [tempo, setTempo] = useState<number>(120);
-    const [timeSig, setTimeSig] = useState<TimeSig>('4/4');
     const [toast, setToast] = useState<string>('');
     const [modal, setModal] = useState<ModalName>(null);
 
@@ -58,8 +54,6 @@ export function SequencerContextProvider({children}: {children: ReactNode}) {
         pattern, setPattern,
         sequenceRef,
         stopSequence,
-        tempo, setTempo,
-        timeSig, setTimeSig,
         toast, setToast,
     }}>
         {children}

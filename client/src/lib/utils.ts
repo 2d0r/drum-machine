@@ -11,7 +11,8 @@ export const generateEmptyPattern = (timeSig: TimeSig) => {
     const pattern = {
         name: 'New pattern',
         steps: {},
-        length,
+        tempo: 120,
+        timeSig,
         createdAt: new Date(),
     } as any;
     Object.keys(DRUM_SAMPLES).forEach(drum => {
@@ -25,7 +26,7 @@ export const generateNewSequence = ({ pattern = DEFAULT_PATTERN, setCurrentStep 
     pattern?: Pattern,
     setCurrentStep: (_: number) => void,
 }) => {
-    const { length } = pattern;
+    const length = pattern.timeSig === '4/4' ? 16 : 12;
     const drums: DrumName[] = Object.keys(DRUM_SAMPLES) as DrumName[];
     // const transportSeconds = Tone.getTransport().seconds;
     // const stepDuration = Tone.Time('16n').toSeconds(); // duration of one step
@@ -69,6 +70,9 @@ export const checkStartTimeIsGreaterThanPrevStartTime = (getCumulativeStep: numb
 
 export const detectGenre = (pattern: Pattern, genrePatterns: GenrePattern[]) => {
     // To do: filtered by timesig and similar tempo
+    genrePatterns = genrePatterns
+        .filter(gp => gp.timeSig === pattern.timeSig)
+        .filter(gp => Math.abs(gp.tempo - pattern.tempo) <= 10);
 
     const p = pattern.steps;
     const genreMatches: Record<string, number> = {};

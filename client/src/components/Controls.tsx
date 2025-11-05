@@ -11,15 +11,12 @@ export default function Controls() {
         sequenceRef,
         isPlaying, setIsPlaying,
         currentStep, setCurrentStep,
-        tempo, setTempo,
-        timeSig, setTimeSig,
         lastStartRef,
         setModal,
         stopSequence
     } = useSequencerContext();
     const tempoDebounceRef = useRef<number | null>(null);
     const toneStartedRef = useRef<boolean>(false);
-    
 
     const handlePlay = async () => {
         if (!toneStartedRef.current) {
@@ -66,7 +63,7 @@ export default function Controls() {
 
     const handleChangeTempo = (event: React.ChangeEvent<HTMLInputElement>) => {
         const newTempo = Number(event.target.value);
-        setTempo(newTempo);
+        setPattern(prev => ({ ...prev, tempo: newTempo }));
 
         if (tempoDebounceRef.current) clearTimeout(tempoDebounceRef.current);
 
@@ -75,13 +72,12 @@ export default function Controls() {
             if (newTempo < 20) clamped = 20;
             if (newTempo > 300) clamped = 300;
 
-            setTempo(clamped);
+            setPattern(prev => ({ ...prev, tempo: clamped }));
             Tone.getTransport().bpm.value = clamped;
         }, 1000);
     };
 
     const handleSelectTimeSignature = async (newTimeSig: TimeSig) => {
-        setTimeSig(newTimeSig);
         stopSequence();
 
         const newPattern = generateEmptyPattern(newTimeSig);
@@ -99,7 +95,7 @@ export default function Controls() {
     }
 
     const handleReset = async () => {
-        setPattern(generateEmptyPattern(timeSig));
+        setPattern(generateEmptyPattern(pattern.timeSig));
     }
 
     return (
@@ -108,7 +104,7 @@ export default function Controls() {
                 <div id='tempo' className='h-10 border-1 border-gray-700 px-2 rounded-xl flex gap-1 items-center justify-between cursor-pointer'>
                     <Timer className='text-gray-700 h-5' />
                     <input
-                        value={tempo}
+                        value={pattern.tempo}
                         onChange={(e) => handleChangeTempo(e)}
                         type='number'
                         className='focus:outline-0 text-center'
@@ -121,7 +117,7 @@ export default function Controls() {
                     <select
                         onChange={(e) => handleSelectTimeSignature(e.target.value as TimeSig)}
                         className='text-center cursor-pointer'
-                        defaultValue={timeSig}
+                        value={pattern.timeSig}
                     >
                         <option value='4/4'>4/4</option>
                         <option value='3/4'>3/4</option>
