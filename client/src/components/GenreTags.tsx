@@ -5,35 +5,20 @@ import { useSequencerContext } from '../lib/sequencerContext';
 import { detectGenre } from '../lib/utils';
 
 export default function GenreTags() {
-    const { genreTagsStatus, setGenreTagsStatus, patternRef } = useSequencerContext();
-    const [ genrePatterns, setGenrePatterns ] = useState<GenrePattern[]>([]);
+    const { pattern, genrePatterns, setGenrePatterns } = useSequencerContext();
     const [ genreMatches, setGenreMatches ] = useState<Record<string, number> | null>(null);
 
     useEffect(() => {
-        if (genreTagsStatus === 'load' || genrePatterns.length === 0) {
-            getGenrePatterns()
+        getGenrePatterns()
             .then((res) => {
                 setGenrePatterns(res.data);
             })
             .catch(error => console.error(error));
+    }, []);
 
-            detectGenre(patternRef.current)
-            .then((matches) => {
-                if (matches) setGenreMatches(matches);
-            })
-            .catch(error => console.error(error));
-
-            setGenreTagsStatus('ready');
-        } else if (genreTagsStatus === 'detect') {
-            detectGenre(patternRef.current)
-            .then((matches) => {
-                if (matches) setGenreMatches(matches);
-            })
-            .catch(error => console.error(error));
-
-            setGenreTagsStatus('ready');
-        }
-    }, [ genreTagsStatus ]);
+    useEffect(() => {
+        setGenreMatches(detectGenre(pattern, genrePatterns));
+    }, [pattern]);
 
     return (
         <div className='absolute bottom-8 w-full flex flex-wrap gap-2 justify-center'>

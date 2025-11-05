@@ -11,8 +11,10 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-mongoose.connect(process.env.MONGO_URI!)
-  .then(() => console.log("✅ MongoDB connected successfully"))
+mongoose.connect(process.env.MONGO_URI!, {
+  autoIndex: true,
+})
+  .then(() => console.log("✅ Connected to local MongoDB"))
   .catch(err => console.error('❌ MongoDB connection error:', err));
 
 app.use('/api/patterns', patternRoutes);

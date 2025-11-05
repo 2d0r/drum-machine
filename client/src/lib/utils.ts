@@ -1,7 +1,6 @@
 import { DEFAULT_PATTERN, DRUM_SAMPLES } from './constants';
 import type { DrumName, GenrePattern, Pattern, TimeSig } from '@shared/types';
 import * as Tone from 'tone';
-import { getGenrePatterns } from './services';
 
 export const getTonejsDrumSampleUrl = (kit: string, drum: DrumName) => {
     return `https://tonejs.github.io/audio/drum-samples/${kit}/${drum}.mp3`;
@@ -68,14 +67,8 @@ export const checkStartTimeIsGreaterThanPrevStartTime = (getCumulativeStep: numb
     return false;
 }
 
-export const detectGenre = async (pattern: Pattern) => {
+export const detectGenre = (pattern: Pattern, genrePatterns: GenrePattern[]) => {
     // To do: filtered by timesig and similar tempo
-    const res = await getGenrePatterns();
-    if (!res.ok) {
-        console.error(res.error);
-        return;
-    }
-    const genrePatterns = res.data as GenrePattern[];
 
     const p = pattern.steps;
     const genreMatches: Record<string, number> = {};

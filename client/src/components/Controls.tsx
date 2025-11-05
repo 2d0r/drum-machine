@@ -7,12 +7,13 @@ import { generateEmptyPattern, generateNewSequence } from '../lib/utils';
 
 export default function Controls() {
     const {
+        pattern, setPattern,
         sequenceRef,
         isPlaying, setIsPlaying,
         currentStep, setCurrentStep,
         tempo, setTempo,
         timeSig, setTimeSig,
-        patternRef, lastStartRef,
+        lastStartRef,
         setModal,
         stopSequence
     } = useSequencerContext();
@@ -43,7 +44,7 @@ export default function Controls() {
         }
 
         // Create a new sequence
-        sequence = generateNewSequence({ setCurrentStep, pattern: patternRef.current });
+        sequence = generateNewSequence({ setCurrentStep, pattern });
         sequenceRef.current = sequence;
 
         
@@ -84,7 +85,7 @@ export default function Controls() {
         stopSequence();
 
         const newPattern = generateEmptyPattern(newTimeSig);
-        patternRef.current = newPattern;
+        setPattern(newPattern);
         
         sequenceRef.current = generateNewSequence({ setCurrentStep, pattern: newPattern });
     };
@@ -98,7 +99,7 @@ export default function Controls() {
     }
 
     const handleReset = async () => {
-        patternRef.current = generateEmptyPattern(timeSig);
+        setPattern(generateEmptyPattern(timeSig));
     }
 
     return (

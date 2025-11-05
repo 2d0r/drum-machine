@@ -1,30 +1,39 @@
 import { XIcon } from 'lucide-react';
 import { useSequencerContext } from '../lib/sequencerContext';
-import { savePattern, saveGenrePattern } from '../lib/services';
-import { useState } from 'react';
+import { savePattern, saveGenrePattern, getGenrePatterns } from '../lib/services';
+import { DEFAULT_PATTERN } from '../lib/constants';
 
 export default function SaveModal() {
-    const { setToast, patternRef, modal, setModal, setGenreTagsStatus } = useSequencerContext();
-    const [ patternName, setPatternName ] = useState<string>(patternRef.current.name);
+    const { 
+        pattern, setPattern, setToast, modal, setModal, setGenrePatterns
+    } = useSequencerContext();
 
     const handleSavePattern = async () => {
-        const res = await savePattern(patternRef.current);
+        const res = await savePattern(pattern);
         if (res?.ok) {
             setToast('Saved pattern!');
         } else {
             setToast('Failed to save pattern');
         }
+        setModal(null);
+        setPattern(DEFAULT_PATTERN);
     }
 
     const handleSaveGenrePattern = async () => {
-        const res = await saveGenrePattern({...patternRef.current, name: patternName});
+        const res = await saveGenrePattern(pattern);
         if (res.ok) {
             setToast('Saved genre pattern!');
-            setGenreTagsStatus('load');
         } else {
             setToast('Failed to save genre pattern');
         }
         setModal(null);
+        setPattern(DEFAULT_PATTERN);
+
+        getGenrePatterns()
+            .then((res) => {
+                setGenrePatterns(res.data);
+            })
+            .catch(error => console.error(error));
     }
 
     const handleClose = () => {
@@ -45,8 +54,8 @@ export default function SaveModal() {
                     <span className='text-gray-600'>Name:</span>
                     <input
                         type='text'
-                        value={patternName}
-                        onChange={(e) => setPatternName(e.target.value)}
+                        value={pattern.name}
+                        onChange={(e) => setPattern({ ...pattern, name: e.target.value })}
                         className='w-full button-primary text-center'
                     />
                 </div>

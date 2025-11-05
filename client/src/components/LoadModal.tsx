@@ -5,7 +5,7 @@ import { type Pattern } from '@shared/types';
 import { deletePattern, getPatterns } from '../lib/services';
 
 export default function LoadModal() {
-    const { modal, setModal, patternRef } = useSequencerContext();
+    const { modal, setModal, setPattern } = useSequencerContext();
     const [patterns, setPatterns] = useState<Pattern[] | null>(null);
 
     useEffect(() => {
@@ -20,7 +20,7 @@ export default function LoadModal() {
     }, [modal]);
 
     const handleLoadPattern = (pattern: Pattern) => {
-        patternRef.current = pattern;
+        setPattern(pattern);
         setModal(null);
     }
 
